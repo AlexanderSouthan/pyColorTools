@@ -1,0 +1,4 @@
+name: pyColorTools
+dependencies:
+  - pandas
+  - numpy
