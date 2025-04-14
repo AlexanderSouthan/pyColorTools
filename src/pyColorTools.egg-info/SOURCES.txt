@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+src/pyColorTools/__init__.py
+src/pyColorTools/ciexyz31.csv
+src/pyColorTools/color_tools.py
+src/pyColorTools.egg-info/PKG-INFO
+src/pyColorTools.egg-info/SOURCES.txt
+src/pyColorTools.egg-info/dependency_links.txt
+src/pyColorTools.egg-info/requires.txt
+src/pyColorTools.egg-info/top_level.txt
+tests/test_class.py

@@ -1,0 +1,32 @@
+Metadata-Version: 2.4
+Name: pyColorTools
+Version: 0.0.1
+Summary: Classes for color conversion between CIE XYZ and RGB.
+Home-page: https://github.com/AlexanderSouthan/pyColorTools
+Author: Alexander Southan
+Author-email: 72788772+AlexanderSouthan@users.noreply.github.com
+Project-URL: Bug Tracker, https://github.com/AlexanderSouthan/pyColorTools/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Dynamic: license-file
+Dynamic: requires-dist
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![build workflow](https://github.com/AlexanderSouthan/pyColorTools/actions/workflows/main.yml/badge.svg)](https://github.com/AlexanderSouthan/pyColorTools/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/AlexanderSouthan/pyColorTools/branch/main/graph/badge.svg?token=ONUNYT0FH5)](https://codecov.io/gh/AlexanderSouthan/pyColorTools)
+
+# pyColorTools
+## Installation
+Downloading and running the following code in the repository folder should work:
+```
+pip install -e .
+```
+## Provides currently:
+* Two classes useful to convert colors from CIE xy or XYZ values to RGB, or to calculate the perceived color from a spectrum
+* Examples in the examples folder include the calculation of colors of thin films and the visualization of the RGB gamut
