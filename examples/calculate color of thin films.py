@@ -81,7 +81,7 @@ for curr_illuminant in illuminants:
     color_objects[curr_illuminant] = colorset(
         reflected_spectra[curr_illuminant], init_format='spectrum')
     color_objects[curr_illuminant].spectrum_to_color(
-        color_space=sRGB, norm=True)
+        color_space=sRGB, norm='global')
     cmap_values[curr_illuminant][:, 0:3] =  color_objects[
         curr_illuminant].RGB.loc[:, ['R', 'G', 'B']]
 

@@ -51,13 +51,11 @@ y_coords[bottom_right_mask] = np.nan
 # Extract the allowed xy values from the coordinates and convert them to RGB
 xy_values = np.vstack([x_coords[~np.isnan(x_coords)], y_coords[~np.isnan(y_coords)]]).T
 rgb_colorset = colorset(xy_values, init_format='xy')
-rgb_colorset.xy_to_RGB(sRGB)
+rgb_colorset.xy_to_RGB(sRGB, norm='individual')
 
-# Take the RGB values and scale each one to max saturation.
-color_values = rgb_colorset.RGB[['R', 'G', 'B']].values
-color_values /= color_values.max(axis=1)[:, np.newaxis]
 
 # Make the colormap and assign ascending numbers to the rgb_triangle
+color_values = rgb_colorset.RGB[['R', 'G', 'B']].values
 cmap = ListedColormap(color_values)
 rgb_triangle[~np.isnan(rgb_triangle)] = np.arange(len(xy_values))
 

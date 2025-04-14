@@ -113,8 +113,8 @@ class colorset:
         Parameters
         ----------
         scale_Y : boolean, optional
-            Defines if in the output is scled such that the output Y equals 1.
-            The default is True.
+            Defines if in the output is scaled such that the output Y equals 1.
+            Works only if y is not zero. The default is True.
     
         Returns
         -------
@@ -122,7 +122,12 @@ class colorset:
             The XYZ values.
     
         """
-        scaling_factor = self.xy['y'] if scale_Y else 1
+        if scale_Y:
+            scaling_factor = self.xy['y']
+            scaling_factor[self.xy['y'] == 0] = 1
+        else:
+            scaling_factor = 1
+        
         self.XYZ[['X', 'Y']] = self.xy
         self.XYZ['Z'] = 1 - self.xy.sum(axis=1)
         self.XYZ[['X', 'Y', 'Z']] = self.XYZ[['X', 'Y', 'Z']].div(
@@ -143,7 +148,7 @@ class colorset:
             self.XYZ.sum(axis=1), axis=0)
         return self.xy
 
-    def XYZ_to_RGB(self, color_space, norm=True):
+    def XYZ_to_RGB(self, color_space, norm='global'):
         """
         Calculate RGB color values from XYZ data.
         
@@ -157,11 +162,12 @@ class colorset:
         color_space : colorspace
             A colorspace instance containing information about the conversion
             matrix.
-        norm : boolean, optional
+        norm : string, optional
             Defines if the RGB output is scaled to the interval between 0 and
             1. This makes sense for example if there is no brightness
-            information in the original data, such as xy color data. The
-            default is True.
+            information in the original data, such as xy color data. Allowed
+            values are 'global', 'individual' or 'none'. The default is
+            'global'.
 
         Returns
         -------
@@ -213,9 +219,20 @@ class colorset:
             # column.
             self.RGB.loc[neg_mask.sum(axis=1) > 0, 'corrected'] = 1
 
-        if not np.all(self.RGB==0) and norm:
-            # Normalize the RGB color values to the range between 0 and 1.
-            self.RGB[['R', 'G', 'B']] /= self.RGB[['R', 'G', 'B']].values.max()
+        if not np.all(self.RGB==0):
+            if norm == 'global':
+                # Normalize the RGB color values to the range between 0 and 1.
+                self.RGB[['R', 'G', 'B']] /= self.RGB[['R', 'G', 'B']].values.max()
+            elif norm == 'individual':
+                self.RGB[['R', 'G', 'B']] = self.RGB[['R', 'G', 'B']].div(
+                    self.RGB[['R', 'G', 'B']].max(axis=1), axis=0)
+            elif norm == 'none':
+                pass
+            else:
+                raise ValueError(
+                    'No valid normalization keyword given. Allowed values are '
+                    '\'global\', \'individual\' and \'none\', but \'{}\' was '
+                    'given.'.format(norm))
     
         return self.RGB
 
@@ -242,7 +259,7 @@ class colorset:
         
         return self.XYZ
 
-    def xy_to_RGB(self, color_space, scale_Y=True, norm=True):
+    def xy_to_RGB(self, color_space, scale_Y=True, norm='global'):
         """
         Convert xy values to RGB.
         
@@ -258,8 +275,8 @@ class colorset:
             matrix.
         scale_Y : boolean, optional
             Is passed to the call of self.xy_to_XYZ. The default is True.
-        norm : boolean, optional
-            Is passed to the call of self.XYZ_to_RGB. The default is True.
+        norm : string, optional
+            Is passed to the call of self.XYZ_to_RGB. The default is 'global'.
 
         Returns
         -------
@@ -296,7 +313,7 @@ class colorset:
 
         return self.xy
 
-    def spectrum_to_color(self, color_space, output='RGB', norm=True):
+    def spectrum_to_color(self, color_space, output='RGB', norm='global'):
         """
         Calculate the perceived color from an light spectrum.
         
@@ -314,9 +331,9 @@ class colorset:
         output : string, optional
             Defines which data is returned. Can be 'RGB' for RGB values or
             anything else for XYZ values. The default is 'RGB'.
-        norm : boolean, optional
-            Defines if the calulated RGB data are normalized. Is passed to the
-            call of self.XYZ_to_RGB. The default is True.
+        norm : string, optional
+            Defines how the calulated RGB data are normalized. Is passed to the
+            call of self.XYZ_to_RGB. The default is 'global'.
 
         Raises
         ------
