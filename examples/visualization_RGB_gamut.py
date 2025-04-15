@@ -63,7 +63,7 @@ rgb_triangle[~np.isnan(rgb_triangle)] = np.arange(len(xy_values))
 # Make the plot
 fig1, ax1 = plt.subplots(dpi=600)
 
-# SHow the colors within the RGB gamut
+# Show the colors within the RGB gamut
 ax1.imshow(
     rgb_triangle, origin='lower',
     extent=(sRGB.primaries.xy['x'].min(), sRGB.primaries.xy['x'].max(),
@@ -82,7 +82,8 @@ ax1.plot(sRGB.primaries.xy.loc[['R', 'G', 'B'], 'x'],
          np.roll(sRGB.primaries.xy.loc[['R', 'G', 'B'], 'y'], 1), c='k', lw=1)
 
 # Make annotations for the wavelengths of the monochrome spectra
-annotation_mask = (sRGB.cmf.index>=460) * (sRGB.cmf.index<630) * (sRGB.cmf.index%2==0)
+annotation_mask = (sRGB.cmf.index%2==0) * (sRGB.cmf.index>=460) * (sRGB.cmf.index<=630)
+
 # Define the offsets of the labels
 x_offsets = pd.Series(
     np.full(np.sum(annotation_mask), 0.01), index=sRGB.cmf.index[annotation_mask])
