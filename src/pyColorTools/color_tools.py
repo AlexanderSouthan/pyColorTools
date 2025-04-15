@@ -130,7 +130,7 @@ class colorset:
         
         self.XYZ[['X', 'Y']] = self.xy
         self.XYZ['Z'] = 1 - self.xy.sum(axis=1)
-        self.XYZ[['X', 'Y', 'Z']] = self.XYZ[['X', 'Y', 'Z']].div(
+        self.XYZ[['X', 'Y', 'Z']] = self.get_color_values('XYZ').div(
             scaling_factor, axis=0)
         return self.XYZ
 
@@ -176,7 +176,7 @@ class colorset:
 
         """
         self.RGB.loc[:, ['R', 'G', 'B']] = color_space.mat_XYZ_to_RGB.dot(
-            self.XYZ[['X', 'Y', 'Z']].T).T
+            self.get_color_values('XYZ').T).T
         
         if np.any(self.RGB < 0):
             # Some colors are outside the RGB gamut, as indicated by negative
@@ -195,7 +195,7 @@ class colorset:
             #       B_corr = B * Y/(Y-Sr*Yr*R)
             # For negative G and B, this is done accordingly. This procedure id
             # briefly mentioned in soapfilmcalc.pdf.
-            neg_mask = self.RGB[['R', 'G', 'B']] < 0
+            neg_mask = self.get_color_values('RGB') < 0
             print('Correcting some colors because outside of RGB '
                   'gamut. See column \'corrected\' in self.RGB for details.')
             for curr_key in neg_mask:
@@ -222,10 +222,10 @@ class colorset:
         if not np.all(self.RGB==0):
             if norm == 'global':
                 # Normalize the RGB color values to the range between 0 and 1.
-                self.RGB[['R', 'G', 'B']] /= self.RGB[['R', 'G', 'B']].values.max()
+                self.RGB[['R', 'G', 'B']] /= self.get_color_values('RGB').values.max()
             elif norm == 'individual':
-                self.RGB[['R', 'G', 'B']] = self.RGB[['R', 'G', 'B']].div(
-                    self.RGB[['R', 'G', 'B']].max(axis=1), axis=0)
+                self.RGB[['R', 'G', 'B']] = self.get_color_values('RGB').div(
+                    self.get_color_values('RGB').max(axis=1), axis=0)
             elif norm == 'none':
                 pass
             else:
@@ -255,7 +255,7 @@ class colorset:
 
         """
         self.XYZ.loc[:, ['X', 'Y', 'Z']] = color_space.mat_RGB_to_XYZ.dot(
-            self.RGB[['R', 'G', 'B']].T).T
+            self.get_color_values('RGB').T).T
         
         return self.XYZ
 
@@ -363,6 +363,18 @@ class colorset:
         else:
             return self.XYZ
 
+    def get_color_values(self, color_type='RGB'):
+        if color_type == 'RGB':
+            return self.RGB[['R', 'G', 'B']]
+        elif color_type == 'XYZ':
+            return self.XYZ[['X', 'Y', 'Z']]
+        elif color_type == 'xy':
+            return self.xy
+        elif color_type == 'spectrum':
+            return self.spectrum
+        else:
+            raise ValueError('No valid color_type provided.')
+
 class colorspace:
     
     def __init__(self, primaries, cmf='CIE_1932'):
@@ -391,8 +403,8 @@ class colorspace:
         """
         # The color space primaries and the white point.
         self.primaries = primaries
-        self.matrix_primaries = self.primaries.XYZ.loc[
-            ['R', 'G', 'B'], ['X', 'Y', 'Z']].T
+        self.matrix_primaries = self.primaries.get_color_values('XYZ').loc[
+            ['R', 'G', 'B']].T
         
         # Import the color matching function for spectrum to color conversion
         if cmf == 'CIE_1932':  # CIE 1931 2-deg, XYZ CMFs, 
@@ -413,8 +425,9 @@ class colorspace:
         #       [Xw]   [Xr, Xg, Xb]   [Sr]
         #       [Yw] = [Yr, Yg, Yb] * [Sg]
         #       [Zw]   [Zr, Zg, Zb]   [Sb]
-        self.s = np.linalg.solve(self.matrix_primaries, self.primaries.XYZ.loc[
-            'white', ['X', 'Y', 'Z']])
+        self.s = np.linalg.solve(
+            self.matrix_primaries,
+            self.primaries.get_color_values('XYZ').loc['white'])
         # Then the conversion matrix for RGB to XYZ conversion is constructed:
         self.mat_RGB_to_XYZ = self.s*self.matrix_primaries
         # Then the conversion matrix for XYZ to RGB conversion is calculated:

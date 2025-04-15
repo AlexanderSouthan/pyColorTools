@@ -56,7 +56,7 @@ rgb_colorset.xy_to_RGB(sRGB, norm='individual')
 
 
 # Make the colormap and assign ascending numbers to the rgb_triangle
-color_values = rgb_colorset.RGB[['R', 'G', 'B']].values
+color_values = rgb_colorset.get_color_values('RGB').values
 cmap = ListedColormap(color_values)
 rgb_triangle[~np.isnan(rgb_triangle)] = np.arange(len(xy_values))
 

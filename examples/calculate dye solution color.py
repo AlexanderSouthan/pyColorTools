@@ -68,7 +68,7 @@ circles = {}
 for idx, curr_name in enumerate(sample_names):
     circles[curr_name] = plt.Circle(
         (idx, 0), 0.5,
-        color=trans_colorset.RGB.loc[curr_name, ['R', 'G', 'B']].values)
+        color=trans_colorset.get_color_values('RGB').loc[curr_name].values)
     ax1.add_patch(circles[curr_name])
     ax1.annotate('Color of {}\nazobenzene in toluene'.format(curr_name),
                  xy=(idx, 0), fontsize=8, ha='center', va='center')

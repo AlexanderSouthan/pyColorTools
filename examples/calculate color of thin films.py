@@ -82,7 +82,7 @@ for curr_illuminant in illuminants:
     color_objects[curr_illuminant].spectrum_to_color(
         color_space=sRGB, norm='global')
     cmap_values[curr_illuminant][:, 0:3] =  color_objects[
-        curr_illuminant].RGB.loc[:, ['R', 'G', 'B']]
+        curr_illuminant].get_color_values('RGB')
 
 figs = {}  # dict to collect the figure objects
 figs_path = {}
