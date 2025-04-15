@@ -13,7 +13,6 @@ from matplotlib.colors import ListedColormap
 from pyColorTools import colorset, sRGB
 from visualization_RGB_gamut import fig1, ax1
 
-
 # Optical parameters of layer and air
 n_0 = 1 # refractive index of air
 n_1 = 1.52 # refractive index of layer
@@ -46,7 +45,7 @@ illuminants['black body with T=6504 K'] = 120*10**15/(wavelengths**5*np.exp(
 
 # Define thickness range and number of data points for the calculations
 min_thickness = 0  # in nm
-max_thickness = 1500  # in nm
+max_thickness = 2000  # in nm
 n_thickness = max_thickness - min_thickness + 1
 thicknesses = np.linspace(min_thickness, max_thickness, n_thickness)
 
@@ -86,7 +85,9 @@ for curr_illuminant in illuminants:
         curr_illuminant].RGB.loc[:, ['R', 'G', 'B']]
 
 figs = {}  # dict to collect the figure objects
+figs_path = {}
 axs = {}  # dict to collect the axis objects
+axs_path = {}
 for curr_illuminant in illuminants:
     # Correct RGB values for displaying according to soapfilmcalc.pdf or
     # http://www.color.org/sRGB.xalter
@@ -116,7 +117,7 @@ for curr_illuminant in illuminants:
     figs[curr_illuminant].savefig('film_color_on_Si_{}nm_{}.png'.format(
         max_thickness, curr_illuminant))
 
-for curr_illuminant in illuminants:
     color_objects[curr_illuminant].XYZ_to_xy()
     ax1.plot(color_objects[curr_illuminant].xy['x'], color_objects[curr_illuminant].xy['y'], ls='-', c='k', lw=1)
-fig1.savefig('thickness_path_through_RGB_gamut.png')
+    fig1.savefig('thickness_path_through_RGB_gamut_{}nm.png'.format(
+        max_thickness))

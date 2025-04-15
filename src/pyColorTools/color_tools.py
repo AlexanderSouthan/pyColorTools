@@ -196,7 +196,7 @@ class colorset:
             # For negative G and B, this is done accordingly. This procedure id
             # briefly mentioned in soapfilmcalc.pdf.
             neg_mask = self.RGB[['R', 'G', 'B']] < 0
-            print('Warning: Correcting some colors because outside of RGB '
+            print('Correcting some colors because outside of RGB '
                   'gamut. See column \'corrected\' in self.RGB for details.')
             for curr_key in neg_mask:
                 # Calculate the correction factor for either R, G or B, as
@@ -395,8 +395,6 @@ class colorspace:
             ['R', 'G', 'B'], ['X', 'Y', 'Z']].T
         
         # Import the color matching function for spectrum to color conversion
-        import os
-        print(os.getcwd())
         if cmf == 'CIE_1932':  # CIE 1931 2-deg, XYZ CMFs, 
             self.cmf = cmf_cie_1931
             self.cmf['lambda_spacing'] = np.diff(

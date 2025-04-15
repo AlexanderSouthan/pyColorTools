@@ -6,6 +6,7 @@ Created on Fri Apr 11 13:58:19 2025
 """
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
@@ -62,18 +63,39 @@ rgb_triangle[~np.isnan(rgb_triangle)] = np.arange(len(xy_values))
 # Make the plot
 fig1, ax1 = plt.subplots(dpi=600)
 
+# SHow the colors within the RGB gamut
 ax1.imshow(
     rgb_triangle, origin='lower',
     extent=(sRGB.primaries.xy['x'].min(), sRGB.primaries.xy['x'].max(),
             sRGB.primaries.xy['y'].min(), sRGB.primaries.xy['y'].max()), cmap=cmap)
 
+# Plot the xy space
 ax1.plot(monochrom.xy['x'], monochrom.xy['y'],
-         np.roll(monochrom.xy['x'], 1), np.roll(monochrom.xy['y'], 1),
          ls='-', lw=1, marker='o', c='grey', ms=2)
+# Close the xy space with a dashed line
+ax1.plot(np.roll(monochrom.xy['x'], 1), np.roll(monochrom.xy['y'], 1), ls='--',
+         c='grey', lw=1)
+# Plot the boundaries of the RGB gamut
 ax1.plot(sRGB.primaries.xy.loc[['R', 'G', 'B'], 'x'],
          sRGB.primaries.xy.loc[['R', 'G', 'B'], 'y'],
          np.roll(sRGB.primaries.xy.loc[['R', 'G', 'B'], 'x'], 1),
          np.roll(sRGB.primaries.xy.loc[['R', 'G', 'B'], 'y'], 1), c='k', lw=1)
+
+# Make annotations for the wavelengths of the monochrome spectra
+annotation_mask = (sRGB.cmf.index>=460) * (sRGB.cmf.index<630) * (sRGB.cmf.index%2==0)
+# Define the offsets of the labels
+x_offsets = pd.Series(
+    np.full(np.sum(annotation_mask), 0.01), index=sRGB.cmf.index[annotation_mask])
+y_offsets = pd.Series(
+    np.full(np.sum(annotation_mask), 0.0), index=sRGB.cmf.index[annotation_mask])
+x_offsets[520], y_offsets[520] = (-0.02, 0.02)
+y_offsets.loc[530:620] = 0.01
+# Place the annotation labels
+for idx, wl in enumerate(sRGB.cmf.index.values[annotation_mask]):
+    ax1.annotate(
+        wl, (monochrom.xy.loc[annotation_mask, 'x'].values[idx]+x_offsets[wl],
+             monochrom.xy.loc[annotation_mask, 'y'].values[idx]+y_offsets[wl]),
+        fontsize=8, va='center')
 
 ax1.set_xlabel('x')
 ax1.set_ylabel('y')
